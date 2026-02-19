@@ -317,30 +317,33 @@ h1, h2, h3, h4, h5 {
   text-align: center;
 }
 
+/* =========================
+  MOBILE OVERRIDES (Home Hero)
+========================= */
+
 @media (max-height: 820px){
   .home-hero__wrap{
     min-height: 640px;
   }
 
   .home-hero__panel{
-    bottom: 30px;
+    bottom: 54px;        /* было 72px */
     height: 260px;
   }
 
   .home-hero__search{
-    top: 52px;
+    top: 22px;
   }
 
   .home-hero__chips{
-    top: 152px;
+    top: 92px;
+  }
+
+  .home-hero__caption{
+    bottom: 16px;
   }
 }
 
-/* =========================
-  MOBILE OVERRIDES (Home Hero)
-  - affects ALL languages (EN/RU/HI/AR)
-  - desktop untouched
-========================= */
 @media (max-width: 768px){
 
   .home-hero__wrap{
@@ -348,22 +351,21 @@ h1, h2, h3, h4, h5 {
     max-height: none;
   }
 
-  /* FIX: ПОЛОЖЕНИЕ КАРТИНКИ ПО ВЫСОТЕ НА ЭКРАНЕ — ВОТ ЗДЕСЬ */
   .home-hero__img{
-    inset: auto;        /* отключили inset:0 только на мобилке */
+    inset: auto;
     left: 0;
     right: 0;
-    top: 150px;          /* <-- ВОТ ЭТО и есть "высота/положение на экране" */
+    top: 70px;
     bottom: auto;
 
-    height: 80%;        /* размер оставляем как ты сделал */
+    height: 80%;
     object-position: center 66%;
   }
 
   .home-hero__panel{
     left: 16px;
     right: 16px;
-    bottom: 24px;
+    bottom: 56px;       /* было 74px */
     height: 260px;
     border-radius: 28px;
   }
@@ -371,7 +373,7 @@ h1, h2, h3, h4, h5 {
   .home-hero__search{
     left: 24px;
     right: 24px;
-    top: 22px;
+    top: 16px;
     height: 60px;
   }
 
@@ -405,8 +407,7 @@ h1, h2, h3, h4, h5 {
   .home-hero__chips{
     left: 24px;
     right: 24px;
-    top: 96px;
-
+    top: 90px;
     justify-content: center;
     gap: 10px;
     flex-wrap: wrap;
@@ -418,16 +419,33 @@ h1, h2, h3, h4, h5 {
   }
 
   .home-hero__caption{
-    bottom: 14px;
+    bottom: 16px;
     font-size: 14px;
     width: calc(100% - 48px);
   }
 }
 
 @media (max-width: 520px){
-  .home-hero__panel{ height: 250px; }
-  .home-hero__search{ left: 18px; right: 18px; }
-  .home-hero__chips{ left: 18px; right: 18px; }
+  .home-hero__panel{
+    height: 250px;
+    bottom: 70px;       /* было 90px */
+  }
+
+  .home-hero__search{
+    left: 18px;
+    right: 18px;
+    top: 14px;
+  }
+
+  .home-hero__chips{
+    left: 18px;
+    right: 18px;
+    top: 86px;
+  }
+
+  .home-hero__caption{
+    bottom: 16px;
+  }
 }
 
 /* =========================
