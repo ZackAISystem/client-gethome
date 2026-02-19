@@ -1,0 +1,220 @@
+<section class="home-hero">
+  <div class="home-hero__wrap">
+
+    {{ $lang := .Site.Language.Lang | default "en" }}
+    {{ $i18nAll := site.Data.site.ui_i18n }}
+    {{ $t := index $i18nAll $lang }}
+    {{ if not $t }}{{ $t = index $i18nAll "en" }}{{ end }}
+
+    <!-- Background image -->
+    <img
+      class="home-hero__img"
+      src="{{ site.Data.site.home.hero_image }}"
+      alt="GetHome hero"
+    >
+
+    <!-- Search panel -->
+    <div class="home-hero__panel">
+
+      <!-- SEARCH FORM -->
+      <form
+        class="home-hero__search"
+        role="search"
+        aria-label="GetHome search"
+      >
+        <!-- search icon -->
+        <img
+          class="home-hero__icon home-hero__icon--search"
+          src="/img/search.png"
+          alt=""
+        >
+
+        <!-- INPUT -->
+        <input
+          class="home-hero__input"
+          type="text"
+          name="q"
+          placeholder="{{ index $t "search_placeholder" | default (site.Data.site.home.search_placeholder) }}"
+          autocomplete="off"
+          data-i18n-placeholder="search_placeholder"
+          data-typing-examples='["Buy an apartment near a park in Dubai","Villa on Saadiyat Island with sea view","Off-plan 1–2 bedroom appartment under 3M AED"]'
+        />
+
+        <!-- voice icon -->
+        <img
+          class="home-hero__icon home-hero__icon--voice"
+          src="/img/voice.png"
+          alt=""
+        >
+
+        <!-- GET -->
+        <button class="home-hero__get" type="submit">
+          <span data-i18n="cta_get">{{ index $t "cta_get" | default (site.Data.site.home.cta_get) }}</span>
+        </button>
+      </form>
+
+      <!-- chips -->
+      <div class="home-hero__chips">
+        {{ range site.Data.site.home.chips }}
+          <button
+            class="home-hero__chip"
+            type="button"
+            data-chip="{{ . }}"
+            data-i18n="{{ . | lower | replaceRE `[^a-z0-9]+` "_" }}"
+          >
+            {{ . }}
+          </button>
+        {{ end }}
+      </div>
+
+      <!-- caption -->
+      <div class="home-hero__caption">
+        <span data-i18n="home_caption">{{ index $t "home_caption" | default (site.Data.site.home.caption) }}</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- JS оставляем как есть -->
+<script>
+(function () {
+  const hero = document.querySelector('.home-hero');
+  if (!hero) return;
+
+  const form  = hero.querySelector('.home-hero__search');
+  const input = hero.querySelector('.home-hero__input');
+  const chips = hero.querySelectorAll('.home-hero__chip');
+
+  if (!form || !input) return;
+
+  function getExamples() {
+    const raw = input.getAttribute('data-typing-examples');
+    if (!raw) return [];
+    try {
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  let examples = getExamples();
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const text = (chip.textContent || '').trim();
+      const cur  = (input.value || '').trim();
+      input.value = cur ? (cur + ' · ' + text) : text;
+      stopTyping();
+      input.focus();
+    });
+  });
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+
+    const results = document.getElementById('results');
+    const query   = document.getElementById('resultsQuery');
+
+    if (!results || !query) return;
+
+    const v = (input.value || '').trim();
+    if (v) query.textContent = v;
+
+    results.classList.add('is-open');
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  let basePlaceholder = input.getAttribute('placeholder') || '';
+  function updateBasePlaceholder() {
+    basePlaceholder = input.getAttribute('placeholder') || '';
+  }
+  window.updateBasePlaceholder = updateBasePlaceholder;
+
+  let exIndex = 0;
+  let charIndex = 0;
+  let timer = null;
+  let paused = false;
+
+  const TYPE_SPEED = 38;
+  const HOLD_END = 900;
+  const HOLD_BETWEEN = 350;
+
+  function isUserActive() {
+    return document.activeElement === input || ((input.value || '').trim().length > 0);
+  }
+
+  function tick() {
+    if (paused || isUserActive()) return;
+    if (!examples || !examples.length) return;
+
+    const full = examples[exIndex] || '';
+    const next = full.slice(0, charIndex + 1);
+
+    input.setAttribute('placeholder', next);
+    charIndex++;
+
+    if (charIndex >= full.length) {
+      timer = setTimeout(() => {
+        if (paused || isUserActive()) return;
+        exIndex = (exIndex + 1) % examples.length;
+        charIndex = 0;
+        input.setAttribute('placeholder', '');
+        timer = setTimeout(tick, HOLD_BETWEEN);
+      }, HOLD_END);
+      return;
+    }
+
+    timer = setTimeout(tick, TYPE_SPEED);
+  }
+
+  function startTyping() {
+    if (timer) return;
+    paused = false;
+    charIndex = 0;
+    input.setAttribute('placeholder', '');
+    timer = setTimeout(tick, 250);
+  }
+
+  function stopTyping() {
+    paused = true;
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+    if (!((input.value || '').trim().length)) {
+      input.setAttribute('placeholder', basePlaceholder);
+    }
+  }
+
+  input.addEventListener('focus', stopTyping);
+  input.addEventListener('keydown', stopTyping);
+  input.addEventListener('input', stopTyping);
+
+  input.addEventListener('blur', () => {
+    if (!((input.value || '').trim().length)) {
+      stopTyping();
+      paused = false;
+      timer = null;
+      startTyping();
+    }
+  });
+
+  window.addEventListener('i18n:applied', () => {
+    examples = getExamples();
+    updateBasePlaceholder();
+
+    if (!((input.value || '').trim().length) && document.activeElement !== input) {
+      stopTyping();
+      paused = false;
+      timer = null;
+      startTyping();
+    }
+  });
+
+  if (!((input.value || '').trim().length)) {
+    startTyping();
+  }
+})();
+</script>

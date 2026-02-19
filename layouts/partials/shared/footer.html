@@ -1,0 +1,56 @@
+{{ $site := site.Data.site }}
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+
+    <!-- Logo -->
+    <a class="site-footer__logo" href="{{ "/" | relLangURL }}" aria-label="{{ $site.brand.name }}">
+      <img src="{{ $site.brand.logo_footer | relURL }}" alt="{{ $site.brand.name }}">
+    </a>
+
+    <!-- Contacts -->
+    <div class="site-footer__contacts">
+      <!-- phone -->
+      <a class="footer-pill footer-pill--ltr"
+         dir="ltr"
+         href="{{ $site.contacts.phone.href | safeURL }}"
+         aria-label="Call {{ $site.contacts.phone.label }}">
+        {{ $site.contacts.phone.label }}
+      </a>
+
+      <!-- email -->
+      <a class="footer-pill footer-pill--ltr"
+         dir="ltr"
+         href="{{ $site.contacts.email.href | safeURL }}"
+         aria-label="Email {{ $site.contacts.email.label }}">
+        {{ $site.contacts.email.label }}
+      </a>
+    </div>
+
+    <!-- Socials -->
+    <div class="site-footer__social" aria-label="Social links">
+      {{ range $site.socials }}
+        <a class="footer-social"
+           href="{{ .url | safeURL }}"
+           target="_blank"
+           rel="noopener"
+           aria-label="{{ .name }}">
+          <img src="{{ .icon | relURL }}" alt="">
+        </a>
+      {{ end }}
+    </div>
+
+    <!-- Bottom -->
+    <div class="site-footer__bottom">
+      <div class="site-footer__copyright" data-i18n="footer_copyright">
+        {{ $site.footer.copyright }}
+      </div>
+
+      <!-- address: можно оставить EN, но сделаем LTR-safe чтобы не разворачивало -->
+      <div class="site-footer__address footer-pill--ltr" dir="ltr">
+        {{ $site.address.text }}
+      </div>
+    </div>
+
+  </div>
+</footer>

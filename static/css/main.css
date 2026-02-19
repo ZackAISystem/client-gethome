@@ -1,0 +1,1796 @@
+/* =========================
+   Reset
+========================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Montserrat", -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #ffffff;
+  color: #0f172a;
+  line-height: 1.5;
+}
+
+/* =========================
+   Layout helpers
+========================= */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.section {
+  padding: 48px 0;
+}
+
+.section--tight {
+  padding: 24px 0;
+}
+
+/* =========================
+   Basic elements
+========================= */
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input,
+textarea {
+  font-family: inherit;
+}
+
+/* =========================
+   Headings (минимум, без дизайна)
+========================= */
+h1, h2, h3, h4, h5 {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* =========================
+   Utilities
+========================= */
+.hidden { display: none; }
+.text-center { text-align: center; }
+.mt-24 { margin-top: 24px; }
+.mb-24 { margin-bottom: 24px; }
+
+/* =========================
+   Page namespaces (пока пусто)
+========================= */
+.page-home {}
+.page-results {}
+.page-project {}
+
+/* =========================
+   Buttons (минимум)
+========================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid transparent;
+  user-select: none;
+  transition: transform .08s ease, opacity .15s ease;
+}
+
+.btn:active { transform: translateY(1px); }
+
+.btn--primary {
+  background: #1e3a8a;
+  color: #ffffff;
+}
+
+.btn--primary:hover { opacity: 0.95; }
+
+/* =========================
+   Header min (Home logo)
+========================= */
+
+.site-header-min{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 0;            /* чтобы не толкал контент */
+  z-index: 60;
+  pointer-events: none; /* чтобы хедер не ловил клики */
+}
+
+.site-header-min__logo{
+  position: absolute;
+  left: 37px;          /* Figma X */
+  top: 0px;            /* Figma Y */
+  width: 194px;        /* Figma W */
+  height: 129px;       /* Figma H */
+  display: block;
+  pointer-events: auto; /* кликается только лого */
+}
+
+.site-header-min__logo img{
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+/* --- Mobile: move logo a bit left (does NOT affect desktop) --- */
+@media (max-width: 768px){
+  .site-header-min__logo{
+    left: 16px;
+  }
+}
+/* =========================
+  Home Hero (main image + search panel)
+========================= */
+
+.home-hero{
+  padding: 0;
+  background: #ffffff;
+}
+
+/* Сцена под один экран */
+.home-hero__wrap{
+  position: relative; /* важно: панель позиционируется внутри */
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+
+  height: 100vh;        /* ключ: один экран */
+  min-height: 720px;    /* страховка */
+  max-height: 900px;    /* чтобы не раздувало на больших мониторах */
+  overflow: hidden;
+}
+
+/* Картинка как фон-сцены (вписываем, не режем) */
+.home-hero__img{
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 65%;
+  display: block;
+
+  object-fit: cover;              /* растягивает */
+  object-position: center 35%;    /* опускаем фокус ниже */
+}
+
+/* Panel positioning */
+.home-hero__panel{
+  position: absolute;
+  left: 130px;
+  right: 130px;
+  bottom: 50px;
+  height: 280px;
+
+  border-radius: 40px;
+  background: linear-gradient(90deg, #93D2FF 0%, #122F73 100%);
+}
+
+/* Search bar */
+.home-hero__search{
+  position: absolute;
+  left: 115px;
+  right: 115px;
+  top: 60px;
+
+  height: 80px;
+  border-radius: 999px;
+  background: #F0F0F0;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+
+  display: flex;
+  align-items: center;
+}
+
+/* INPUT вместо плейсхолдера-спана (функционал без изменения дизайна) */
+.home-hero__input{
+  border: 0;
+  outline: none;
+  background: transparent;
+
+  /* сохраняем твои параметры текста */
+  margin-left: 95px;
+  font-weight: 500;
+  font-size: 25px;
+  color: #3E3E3E;
+  line-height: 1;
+
+  width: calc(100% - 95px - 35px - 150px - 17px - 35px); 
+  /* объяснение: место под левый отступ + иконку voice + кнопку Get + её отступы */
+
+  padding: 0;
+}
+
+.home-hero__input::placeholder{
+  color: #9a9a9a;
+}
+
+.home-hero__get{
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Icons */
+.home-hero__icon{
+  width: 35px;
+  height: 35px;
+  display: block;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.home-hero__icon--search{ left: 35px; }
+
+/* Get button */
+.home-hero__get{
+  position: absolute;
+  right: 35px;
+  top: 15px;
+  bottom: 15px;
+
+  width: 150px;
+  border-radius: 999px;
+  background: #8EB144;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 500;
+  font-size: 25px;
+  color: #ffffff;
+}
+
+/* Voice icon: 17px left from Get */
+.home-hero__icon--voice{
+  right: calc(35px + 150px + 17px);
+}
+
+/* Chips */
+.home-hero__chips{
+  position: absolute;
+  left: 195px;
+  right: 195px;
+  top: 165px;
+
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.home-hero__chip{
+  background: #F0F0F0;
+  border-radius: 999px;
+  padding: 10px 18px;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+
+  font-weight: 500;
+  font-size: 16px;
+  color: #3E3E3E;
+  white-space: nowrap;
+}
+
+/* Caption */
+.home-hero__caption{
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 20px;
+
+  font-weight: 600;
+  font-size: 20px;
+  color: #ffffff;
+  text-align: center;
+}
+
+@media (max-height: 820px){
+  .home-hero__wrap{
+    min-height: 640px;
+  }
+
+  .home-hero__panel{
+    bottom: 30px;
+    height: 260px;
+  }
+
+  .home-hero__search{
+    top: 52px;
+  }
+
+  .home-hero__chips{
+    top: 152px;
+  }
+}
+
+/* =========================
+  MOBILE OVERRIDES (Home Hero)
+  - affects ALL languages (EN/RU/HI/AR)
+  - desktop untouched
+========================= */
+@media (max-width: 768px){
+
+  .home-hero__wrap{
+    min-height: 640px;
+    max-height: none;
+  }
+
+  /* FIX: ПОЛОЖЕНИЕ КАРТИНКИ ПО ВЫСОТЕ НА ЭКРАНЕ — ВОТ ЗДЕСЬ */
+  .home-hero__img{
+    inset: auto;        /* отключили inset:0 только на мобилке */
+    left: 0;
+    right: 0;
+    top: 150px;          /* <-- ВОТ ЭТО и есть "высота/положение на экране" */
+    bottom: auto;
+
+    height: 80%;        /* размер оставляем как ты сделал */
+    object-position: center 66%;
+  }
+
+  .home-hero__panel{
+    left: 16px;
+    right: 16px;
+    bottom: 24px;
+    height: 260px;
+    border-radius: 28px;
+  }
+
+  .home-hero__search{
+    left: 24px;
+    right: 24px;
+    top: 22px;
+    height: 60px;
+  }
+
+  .home-hero__icon{
+    width: 22px;
+    height: 22px;
+  }
+
+  .home-hero__icon--search{
+    left: 18px;
+  }
+
+  .home-hero__icon--voice{
+    display: none;
+  }
+
+  .home-hero__get{
+    right: 14px;
+    top: 10px;
+    bottom: 10px;
+    width: 96px;
+    font-size: 16px;
+  }
+
+  .home-hero__input{
+    margin-left: 54px;
+    font-size: 16px;
+    width: calc(100% - 54px - 22px - 96px - 14px);
+  }
+
+  .home-hero__chips{
+    left: 24px;
+    right: 24px;
+    top: 96px;
+
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .home-hero__chip{
+    font-size: 14px;
+    padding: 8px 14px;
+  }
+
+  .home-hero__caption{
+    bottom: 14px;
+    font-size: 14px;
+    width: calc(100% - 48px);
+  }
+}
+
+@media (max-width: 520px){
+  .home-hero__panel{ height: 250px; }
+  .home-hero__search{ left: 18px; right: 18px; }
+  .home-hero__chips{ left: 18px; right: 18px; }
+}
+
+/* =========================
+  RTL override (only Home Hero)
+  - does NOT touch LTR
+========================= */
+body.rtl .home-hero__panel{
+  left: 130px;
+  right: 130px;
+}
+
+body.rtl .home-hero__search{
+  left: 115px;
+  right: 115px;
+}
+
+body.rtl .home-hero__input{
+  margin-left: 0;
+  margin-right: 95px;
+  width: calc(100% - 95px - 35px - 150px - 17px - 35px);
+}
+
+body.rtl .home-hero__icon--search{
+  left: auto;
+  right: 35px;
+}
+
+body.rtl .home-hero__get{
+  right: auto;
+  left: 35px;
+}
+
+body.rtl .home-hero__icon--voice{
+  right: auto;
+  left: calc(35px + 150px + 17px);
+}
+
+body.rtl .home-hero__chips{
+  flex-direction: row-reverse;
+}
+
+body.rtl .home-hero__caption{
+  direction: rtl;
+}
+
+/* ===== MOBILE RTL (match mobile numbers above) ===== */
+@media (max-width: 768px){
+
+  body.rtl .home-hero__panel{
+    left: 16px;
+    right: 16px;
+  }
+
+  body.rtl .home-hero__search{
+    left: 24px;
+    right: 24px;
+  }
+
+  body.rtl .home-hero__icon--search{
+    left: auto;
+    right: 18px;
+  }
+
+  body.rtl .home-hero__get{
+    right: auto;
+    left: 14px;
+  }
+
+  body.rtl .home-hero__icon--voice{
+    display: none;
+  }
+
+  body.rtl .home-hero__input{
+    margin-left: 0;
+    margin-right: 54px;
+    font-size: 16px;
+    width: calc(100% - 54px - 22px - 96px - 14px);
+  }
+}
+
+@media (max-width: 520px){
+  body.rtl .home-hero__search{ left: 18px; right: 18px; }
+}
+
+/* =========================
+  Results (grid + sticky search)
+========================= */
+
+.results{
+  display: none;               /* скрыто до нажатия Get */
+  padding-top: 0;
+}
+
+.results.is-open{
+  display: block;
+}
+
+/* Sticky bar area */
+.results__sticky{
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: transparent;
+  padding-top: 50px;           /* 50px до верха экрана */
+}
+
+.results__sticky-inner{
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Search bar */
+.results__bar{
+  width: calc(100% - 200px);   /* 100px слева + 100px справа */
+  max-width: 1200px;
+  height: 56px;
+  border-radius: 999px;
+  background: #F0F0F0;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-left: 40px;          /* текст 40px слева */
+  padding-right: 40px;         /* крестик 40px справа */
+}
+
+/* text inside (div OR input) */
+.results__query{
+  flex: 1;                     /* важно для корректного поведения в flex */
+  min-width: 0;                /* иначе ellipsis/сжатие ломаются */
+
+  font-weight: 500;            /* medium */
+  font-size: 16px;
+  color: #111827;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* если results__query будет <input>, делаем его визуально как текст */
+.results__query--input{
+  border: 0;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+
+  width: 100%;
+  height: 24px;
+  line-height: 24px;
+
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.results__query--input::placeholder{
+  color: rgba(17,24,39,.55);
+}
+
+/* clear button */
+.results__clear{
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  flex: 0 0 auto;
+}
+
+.results__clear img{
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* spacing from bar to cards */
+.results__grid{
+  margin-top: 40px;            /* 40px от плашки до объектов */
+  padding-left: 100px;         /* до краёв экрана 100 */
+  padding-right: 100px;
+  padding-bottom: 0;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 20px;            /* горизонталь 20 */
+  row-gap: 35px;               /* вертикаль 35 */
+}
+
+/* Card base */
+.results-card{
+  border-radius: 30px;
+  position: relative;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Gradient border 1px default */
+.results-card::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 30px;
+  padding: 1px; /* default 1px */
+  background: linear-gradient(90deg, #8DCBF9 0%, #163477 100%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Hover: border becomes 4px */
+.results-card:hover::before{
+  padding: 4px;
+}
+
+/* Inner */
+.results-card__inner{
+  border-radius: 30px;
+  overflow: hidden;
+  background: #ffffff;
+  min-height: 240px;
+}
+
+/* Real image card */
+.results-card__img{
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Meta overlay */
+.results-card__meta{
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+
+  background: rgba(0,0,0,0.30);
+  border-radius: 18px;
+  padding: 14px 16px;
+}
+
+.results-card__title{
+  font-weight: 600; /* semibold */
+  font-size: 18px;
+  color: #ffffff;
+  margin-bottom: 6px;
+}
+
+.results-card__row{
+  font-weight: 500; /* medium */
+  font-size: 16px;
+  color: #ffffff;
+  line-height: 1.35;
+}
+
+/* Placeholders: empty squares */
+.results-card--placeholder .results-card__inner{
+  background: #ffffff;
+  min-height: 240px;
+}
+
+/* bottom space to footer */
+.results__bottom-space{
+  height: 100px; /* от объектов до футера 100px */
+}
+
+/* Responsive quick safety (не ломает десктоп) */
+@media (max-width: 1100px){
+  .results__grid{ grid-template-columns: repeat(2, 1fr); }
+  .results__bar{ width: calc(100% - 40px); }
+  .results__grid{ padding-left: 20px; padding-right: 20px; }
+}
+
+@media (max-width: 680px){
+  .results__grid{ grid-template-columns: 1fr; }
+}
+
+/* =========================
+  RTL (Arabic) - Results overrides
+  (включается только когда body.rtl или html dir=rtl)
+========================= */
+
+/* РЕАЛЬНЫЙ RTL-триггер */
+html[dir="rtl"] .results__bar,
+body.rtl .results__bar{
+  flex-direction: row-reverse !important; /* гарантированно */
+}
+
+/* текст справа + rtl-направление */
+html[dir="rtl"] .results__query,
+body.rtl .results__query{
+  text-align: right;
+  direction: rtl;
+}
+
+/* если query — input, тоже RTL */
+html[dir="rtl"] .results__query--input,
+body.rtl .results__query--input{
+  text-align: right;
+  direction: rtl;
+  unicode-bidi: plaintext;
+}
+
+/* крестик уезжает влево (из-за row-reverse) — добавим отступ от текста */
+html[dir="rtl"] .results__clear,
+body.rtl .results__clear{
+  margin-left: 16px;   /* расстояние между крестиком и текстом */
+  margin-right: 0;
+}
+
+/* карточки: текст внутри мета-блока вправо */
+html[dir="rtl"] .results-card__title,
+html[dir="rtl"] .results-card__row,
+body.rtl .results-card__title,
+body.rtl .results-card__row{
+  text-align: right;
+  direction: rtl;
+}
+
+/* ===== PRICE: стабильный порядок в RTL ===== */
+.price{
+  display: inline-flex;
+  gap: 6px;
+  align-items: baseline;
+
+  /* чтобы цифры и AED не "плясали" в bidi */
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.price__currency,
+.price__value{
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* В RTL меняем order: будет "8,000,000 AED" */
+html[dir="rtl"] .price__currency,
+body.rtl .price__currency{
+  order: 2 !important;
+}
+
+html[dir="rtl"] .price__value,
+body.rtl .price__value{
+  order: 1 !important;
+}
+
+/* LTR-кусочки (телефон/емейл/урлы) — чтобы не “переворачивались” */
+html[dir="rtl"] a[href^="tel:"],
+html[dir="rtl"] a[href^="mailto:"],
+body.rtl a[href^="tel:"],
+body.rtl a[href^="mailto:"]{
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+}
+
+/* Если хочешь, чтобы “Location: …” визуально было справа налево,
+   но двоеточие не ехало — можно позже заменить на шаблон без ":".
+   Пока не трогаем контент, только выравнивание. */
+
+/* =========================
+   Block: Gallery Hero (Project page)
+   Full-bleed like mock
+========================= */
+
+.gallery-hero {
+  /* никаких padding сверху/снизу — фулл-блок */
+  padding: 0;
+}
+
+.gallery-hero__stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #f1f5f9;
+}
+
+.gallery-hero__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Hero title: white, 60px semibold, left 100, top 100 */
+.gallery-hero__title {
+  position: absolute;
+  left: 100px;
+  top: 100px;
+  z-index: 3;
+
+  margin: 0;
+
+  font-size: 60px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: #ffffff;
+
+  /* чтобы белый текст читался на светлых фото */
+  text-shadow: 0 6px 22px rgba(0,0,0,0.35);
+}
+
+/* Nav buttons */
+.gallery-hero__nav {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.60);
+  display: grid;
+  place-items: center;
+  bottom: 52px;
+  z-index: 3;
+}
+
+.gallery-hero__nav svg {
+  width: 22px;
+  height: 22px;
+  stroke: #fff;
+  stroke-width: 2.4;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.gallery-hero__nav--prev {
+  left: 100px;
+}
+
+.gallery-hero__nav--next {
+  right: 414px;
+}
+
+/* CTA */
+.gallery-hero__pdf {
+  position: absolute;
+  right: 100px;
+  bottom: 40px;
+  z-index: 3;
+
+  height: 72px;
+  padding: 0 28px;
+
+  background: rgba(20, 14, 86, 0.60);
+  color: #ffffff;
+
+  border-radius: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* =========================
+   MOBILE (ONLY) — layout row: [prev][next][pdf]
+   - title lower with nicer spacing
+   - desktop untouched
+========================= */
+@media (max-width: 768px) {
+  .gallery-hero__stage {
+    height: 72vh; /* на мобиле лучше не 100vh */
+  }
+
+  /* 1) Title: ниже и с красивым отступом */
+  .gallery-hero__title {
+    left: 16px;
+    top: 64px;          /* было 16px — опустили ниже */
+    font-size: 28px;
+    max-width: calc(100% - 32px);
+  }
+
+  /* 2) Собираем controls в один ряд снизу */
+  .gallery-hero__nav,
+  .gallery-hero__pdf {
+    bottom: 18px;       /* один baseline для всех */
+  }
+
+  /* prev */
+  .gallery-hero__nav--prev {
+    left: 16px;
+  }
+
+  /* next — сразу справа от prev */
+  .gallery-hero__nav--next {
+    left: 150px;         /* 16 + 48 + 8 */
+    right: auto;
+  }
+
+  /* pdf — справа, в том же ряду */
+  .gallery-hero__pdf {
+    right: 16px;
+    left: auto;
+
+    height: 56px;
+    border-radius: 32px;
+    font-size: 16px;
+    padding: 0 18px;
+  }
+}
+
+/* =========================
+  RTL (Arabic) - Gallery Hero overrides
+  (desktop rules keep as-is)
+========================= */
+
+/* 1) Заголовок: переносим с left -> right */
+html[dir="rtl"] .gallery-hero__title,
+body.rtl .gallery-hero__title{
+  left: auto;
+  right: 100px;
+  text-align: right;
+  direction: rtl;
+}
+
+/* 2) CTA кнопка: переносим с right -> left */
+html[dir="rtl"] .gallery-hero__pdf,
+body.rtl .gallery-hero__pdf{
+  right: auto;
+  left: 100px;
+  text-align: right;
+  direction: rtl;
+}
+
+/* 3) Кнопки навигации: зеркалим prev/next */
+html[dir="rtl"] .gallery-hero__nav--prev,
+body.rtl .gallery-hero__nav--prev{
+  left: auto;
+  right: 414px;
+}
+
+html[dir="rtl"] .gallery-hero__nav--next,
+body.rtl .gallery-hero__nav--next{
+  right: auto;
+  left: 414px;
+}
+
+/* 4) Зеркалим стрелки */
+html[dir="rtl"] .gallery-hero__nav svg,
+body.rtl .gallery-hero__nav svg{
+  transform: scaleX(-1);
+}
+
+/* ===== Mobile RTL ===== */
+@media (max-width: 768px) {
+
+  /* Title ниже, справа */
+  html[dir="rtl"] .gallery-hero__title,
+  body.rtl .gallery-hero__title{
+    left: auto;
+    right: 16px;
+    top: 64px;
+    text-align: right;
+    direction: rtl;
+    max-width: calc(100% - 32px);
+  }
+
+  /* PDF — слева */
+  html[dir="rtl"] .gallery-hero__pdf,
+  body.rtl .gallery-hero__pdf{
+    left: 16px;
+    right: auto;
+    bottom: 18px;
+  }
+
+  /* ✅ УВЕЛИЧИЛИ РАССТОЯНИЕ МЕЖДУ СТРЕЛКАМИ — как в EN */
+  html[dir="rtl"] .gallery-hero__nav--next,
+  body.rtl .gallery-hero__nav--next{
+    left: auto;
+    right: 140px;   /* ← было 72px, теперь как ты сделал в EN */
+    bottom: 18px;
+  }
+
+  html[dir="rtl"] .gallery-hero__nav--prev,
+  body.rtl .gallery-hero__nav--prev{
+    left: auto;
+    right: 16px;
+    bottom: 18px;
+  }
+
+}
+/* =========================
+   Block: Project Info (Project page)
+   Cards + pills like mock
+========================= */
+
+.project-info {
+  background: #F5F5F5;
+}
+
+.project-info__wrap {
+  /* отступы до края экрана 100px */
+  padding: 40px 100px 60px;
+}
+
+/* Top pills row */
+.project-info__pills {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 30px;
+  align-items: stretch;
+  margin-top: 40px; /* "до верхнего края 40px" (после галереи) */
+  margin-bottom: 30px;
+}
+
+.pill {
+  background: #ffffff;
+  border-radius: 40px;
+  padding: 18px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.pill--title {
+  justify-content: flex-start;
+}
+
+.pill__title {
+  font-size: 30px;
+  font-weight: 600;
+  color: #000000;
+  line-height: 1.1;
+}
+
+.pill__label {
+  font-size: 20px;
+  font-weight: 600;
+  color: #666666;
+}
+
+.pill__value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000000;
+}
+
+/* Cards grid */
+.project-info__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px; /* между собой везде 30px */
+}
+
+/* Card */
+.card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 40px;
+  overflow: hidden;
+}
+
+.card__head {
+  padding: 26px 30px 24px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #000000;
+}
+
+/* тонкая полоска на 75px от верха карточки */
+.card::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 75px;
+  height: 1px;
+  background: rgba(0,0,0,0.08);
+}
+
+.card__body {
+  padding: 22px 30px 30px; /* "отступ слева 30" */
+}
+
+/* Key/Value rows */
+.kv {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 20px;
+  align-items: baseline;
+  margin-bottom: 20px; /* "между заголовками вниз 20" */
+}
+
+.kv:last-child {
+  margin-bottom: 0;
+}
+
+.kv__label {
+  font-size: 20px;
+  font-weight: 600;
+  color: #666666;
+}
+
+.kv__value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.kv--row {
+  grid-template-columns: 1fr auto;
+}
+
+/* Description text */
+.desc {
+  margin: 0;
+  font-size: 15px;
+  color: #666666;
+  line-height: 1.55;
+}
+
+/* =========================
+   Location card layout (final)
+========================= */
+
+.card--location {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* header: Location слева, адрес справа */
+.card__head--location {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.card__head--location .card__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.card__head--location .card__value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #666666;
+  padding-left: 30px;
+  white-space: nowrap;
+}
+
+/* тело карточки — flex, чтобы карта заняла всё до низа */
+.card__body--map {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.loc__map {
+  flex: 1;
+  width: 100%;
+  min-height: 260px;
+
+  border-radius: 0 0 40px 40px;
+  overflow: hidden;
+
+  background: #e5e7eb;
+}
+
+.loc__map iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* CTA row under cards */
+.project-info__cta {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.cta-pill {
+  height: 52px;
+  padding: 0 22px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  box-shadow: 0 10px 22px rgba(0,0,0,0.12);
+}
+
+.cta-pill--ghost {
+  background: #ffffff;
+  color: #666666;
+}
+
+.cta-pill--green {
+  background: #8EB144;
+  color: #ffffff;
+}
+
+.cta-pill--blue {
+  background: #143174;
+  color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .project-info__wrap {
+    padding: 32px 24px 48px;
+  }
+
+  .project-info__pills {
+    grid-template-columns: 1fr;
+  }
+
+  .project-info__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kv {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .loc__map {
+    min-height: 220px;
+  }
+}
+
+/* =========================
+  ✅ MOBILE TIGHT (phones only) — DESKTOP NOT TOUCHED
+========================= */
+@media (max-width: 768px) {
+
+  .project-info__wrap{
+    padding: 22px 18px 34px;
+  }
+
+  .pill{
+    border-radius: 28px;
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  .pill__title{
+    font-size: 26px;
+    line-height: 1.08;
+  }
+
+  .pill__label,
+  .pill__value{
+    font-size: 16px;
+  }
+
+  .card{
+    border-radius: 28px;
+  }
+
+  .card__head{
+    padding: 18px 18px 16px;
+    font-size: 16px;
+  }
+
+  .card::after{
+    top: 56px;
+  }
+
+  .card__body{
+    padding: 16px 18px 18px;
+  }
+
+  .kv{
+    grid-template-columns: 140px 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+    align-items: baseline;
+  }
+
+  .kv__label,
+  .kv__value{
+    font-size: 16px;
+  }
+
+  .desc{
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .card__head--location .card__title{
+    font-size: 16px;
+  }
+
+  .card__head--location .card__value{
+    font-size: 16px;
+    padding-left: 16px;
+    white-space: nowrap;
+  }
+
+  .loc__map{
+    min-height: 200px;
+    border-radius: 0 0 28px 28px;
+  }
+
+  .project-info__cta{
+    gap: 12px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+
+  .cta-pill{
+    height: 44px;
+    padding: 0 16px;
+    font-size: 14px;
+  }
+}
+
+/* =========================
+  RTL (Arabic) - Project Info overrides
+  ✅ IMPORTANT: ONLY html[dir="rtl"] (чтобы не протекало в EN)
+========================= */
+
+html[dir="rtl"] .project-info{
+  direction: rtl;
+}
+
+html[dir="rtl"] .pill,
+html[dir="rtl"] .card__head,
+html[dir="rtl"] .card__body,
+html[dir="rtl"] .kv__label,
+html[dir="rtl"] .kv__value{
+  text-align: right;
+}
+
+/* Pills: базово разворачиваем */
+html[dir="rtl"] .pill{
+  flex-direction: row-reverse;
+}
+
+/* Title pill: НЕ переворачиваем, просто заголовок вправо */
+html[dir="rtl"] .pill--title{
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+html[dir="rtl"] .pill--title .pill__title{
+  width: 100%;
+  text-align: right;
+}
+
+/* KV: зеркалим (desktop/tablet) */
+html[dir="rtl"] .kv{
+  direction: rtl;
+  grid-template-columns: 1fr 260px; /* value | label */
+}
+
+html[dir="rtl"] .kv__label{
+  justify-self: end;
+  text-align: right;
+}
+
+html[dir="rtl"] .kv__value{
+  justify-self: start;
+  text-align: left;
+}
+
+html[dir="rtl"] .kv--row{
+  grid-template-columns: auto 1fr;
+}
+
+/* Location header */
+html[dir="rtl"] .card__head--location{
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .card__head--location .card__value{
+  padding-left: 0;
+  padding-right: 30px;
+}
+
+/* CTA ряд */
+html[dir="rtl"] .project-info__cta{
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .project-info__cta .cta-pill--ghost{
+  direction: rtl;
+}
+
+/* PRICE bidi stable */
+.price{
+  display: inline-flex;
+  gap: 6px;
+  align-items: baseline;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.price__currency,
+.price__value{
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+html[dir="rtl"] .price__currency{
+  order: 2 !important;
+}
+
+html[dir="rtl"] .price__value{
+  order: 1 !important;
+}
+
+html[dir="rtl"] .bidi-ltr{
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+}
+
+html[dir="rtl"] a[href^="tel:"],
+html[dir="rtl"] a[href^="mailto:"]{
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+}
+
+/* =========================
+  ✅ ONLY TWO FIXES (RTL mobile)
+  1) Top pills: label/value order for handover+price
+  2) Mobile kv widths: NOT 260px
+========================= */
+@media (max-width: 768px){
+
+  /* FIX #2: Mobile RTL kv widths (value | label) */
+  html[dir="rtl"] .project-info .kv{
+    grid-template-columns: 1fr 140px; /* value | label */
+  }
+
+  /* FIX #1: Handover/Price pills — label справа, value слева */
+  html[dir="rtl"] .project-info__pills .pill:not(.pill--title) .pill__label{
+    order: 2;
+    text-align: right;
+  }
+
+  html[dir="rtl"] .project-info__pills .pill:not(.pill--title) .pill__value{
+    order: 1;
+    text-align: left;
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  /* Title pill на мобилке — просто держим справа */
+  html[dir="rtl"] .project-info__pills .pill--title{
+    justify-content: flex-end;
+  }
+
+  html[dir="rtl"] .project-info__pills .pill--title .pill__title{
+    text-align: right;
+    width: 100%;
+  }
+}
+
+/* =========================
+   Footer (GetHome)
+========================= */
+
+.site-footer {
+  background: #0B1F45;           /* твой темно-синий */
+  color: #ffffff;
+  height: 380px;
+  position: relative;
+}
+
+.site-footer * {
+  color: #ffffff;
+}
+
+/* страховка от декоративных слоёв, которые могут перехватывать клики */
+.site-footer::before,
+.site-footer::after{
+  pointer-events: none;
+}
+
+.site-footer__inner {
+  position: relative;
+  height: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+
+  /* общий отступ слева/справа как ты сказал */
+  padding-left: 120px;
+  padding-right: 120px;
+}
+
+/* --- LOGO --- */
+.site-footer__logo {
+  position: absolute;
+  left: 120px;
+  top: 1px;
+
+  /* "подвинуть на глаз" влево — вот этот параметр крути */
+  transform: translateX(-75px);
+  z-index: 2;
+}
+
+.site-footer__logo img {
+  width: 324px;
+  height: 216px;
+  display: block;
+  object-fit: contain;
+}
+
+/* --- CONTACT PILLS: phone + email (В ОДИН РЯД) --- */
+.site-footer__contacts {
+  position: absolute;
+  right: 120px;
+  top: 60px;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+
+  z-index: 5;            /* важно: поверх всего */
+  pointer-events: auto;  /* важно */
+}
+
+.footer-pill {
+  height: 52px;
+  padding: 0 22px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+
+  background: transparent;
+
+  font-family: "Montserrat", -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* --- SOCIAL ICONS --- */
+.site-footer__social {
+  position: absolute;
+  right: 136px;
+  bottom: 142px;
+
+  display: flex;
+  align-items: center;
+  gap: 30px;
+
+  z-index: 5;            /* важно: поверх */
+  pointer-events: auto;
+}
+
+.footer-social {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.footer-social img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* --- BOTTOM LINE: copyright left + address right --- */
+.site-footer__bottom {
+  position: absolute;
+  left: 120px;
+  right: 120px;
+  bottom: 87px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+
+  z-index: 2;
+}
+
+.site-footer__copyright,
+.site-footer__address {
+  font-size: 14px;
+  font-weight: 400;
+  opacity: 0.95;
+}
+
+.site-footer__address {
+  text-align: right;
+  max-width: 620px;
+}
+
+/* --- optional: mobile fallback --- */
+@media (max-width: 900px) {
+  .site-footer {
+    height: auto;
+    padding: 40px 0;
+  }
+
+  .site-footer__inner {
+    position: static;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .site-footer__logo,
+  .site-footer__contacts,
+  .site-footer__social,
+  .site-footer__bottom {
+    position: static;
+    transform: none;
+  }
+
+  /* ✅ FIX (mobile only): прижимаем ЛОГО влево (не через margin/transform) */
+  .site-footer__logo{
+    display: flex;
+    justify-content: flex-start; /* <-- вот это “влево” */
+    width: 100%;
+  }
+
+  .site-footer__contacts {
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .site-footer__social {
+    margin-top: 24px;
+  }
+
+  .site-footer__bottom {
+    margin-top: 28px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .site-footer__address {
+    text-align: left;
+    max-width: none;
+  }
+}
+
+/* =========================
+  RTL: keep phone/email/address LTR-safe
+  (на мобилке футер оставляем как обычный, без зеркала)
+========================= */
+body.rtl .footer-pill--ltr,
+body.rtl a[href^="tel:"],
+body.rtl a[href^="mailto:"]{
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+}
+
+/* =========================
+  Floating CTA (WhatsApp + Telegram)
+========================= */
+
+.floating-cta{
+  position: fixed;
+  right: 20px;          /* десктоп: справа */
+  bottom: 50px;         /* десктоп: снизу */
+  z-index: 9999;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.floating-cta__btn{
+  width: 75px;
+  height: 75px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  overflow: hidden;
+  background: transparent;
+
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+.floating-cta__btn:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.floating-cta__img{
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* ✅ Mobile: again centered vertically (not near bottom) */
+@media (max-width: 520px){
+  .floating-cta{
+    right: 10px;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    gap: 8px;
+  }
+
+  .floating-cta__btn{
+    width: 64px;
+    height: 64px;
+  }
+}
+
+/* ✅ Mobile RTL (Arabic): centered vertically but on LEFT */
+@media (max-width: 520px){
+  body.rtl .floating-cta{
+    right: auto;
+    left: 10px;
+  }
+}
+
+/* =========================
+   Debug helper (опционально)
+========================= */
+/*
+.section {
+  outline: 1px dashed rgba(0,0,0,0.1);
+}
+*/

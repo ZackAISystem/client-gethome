@@ -1,0 +1,151 @@
+<section id="results" class="results" aria-hidden="true">
+
+  {{/* ---------- language ---------- */}}
+  {{ $lang := .Site.Language.Lang | default "en" }}
+
+  {{/* ---------- ui i18n ---------- */}}
+  {{ $i18nAll := site.Data.site.ui_i18n }}
+  {{ $t := index $i18nAll $lang }}
+  {{ if not $t }}{{ $t = index $i18nAll "en" }}{{ end }}
+
+  {{/* ---------- projects dataset ---------- */}}
+  {{ $projects := site.Data.projects }}
+
+  <!-- sticky search -->
+  <div class="results__sticky">
+    <div class="results__sticky-inner">
+      <div class="results__bar">
+        <!-- ✅ IMPORTANT: id resultsQuery сохраняем -->
+        <input
+          id="resultsQuery"
+          class="results__query results__query--input"
+          type="text"
+          autocomplete="off"
+          placeholder="Type your search…"
+          data-i18n-placeholder="results_search_placeholder"
+          aria-label="Search query"
+        />
+
+        <button id="resultsClear" class="results__clear" type="button" aria-label="Clear">
+          <img src="/img/x.png" alt="" data-i18n-alt="clear">
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- grid -->
+  <div class="results__grid">
+
+    {{ range $key, $p := $projects }}
+
+      {{ $slug := "" }}
+      {{ with $p.slug }}{{ $slug = . }}{{ end }}
+      {{ if not $slug }}{{ $slug = $key }}{{ end }}
+
+      {{ $projectURL := (printf "projects/%s/" $slug) | relLangURL }}
+
+      {{ $title := partial "helpers/localize.html" (dict "v" (or $p.project_name $p.hero_title $p.name) "lang" $lang) }}
+      {{ if not $title }}{{ $title = $slug }}{{ end }}
+
+      {{ $loc := partial "helpers/localize.html" (dict "v" $p.location_text "lang" $lang) }}
+
+      {{ $img := "/img/placeholder.jpg" }}
+      {{ with $p.promo_image }}{{ $img = . }}{{ end }}
+
+      {{ $currency := "" }}
+      {{ $amount := "" }}
+      {{ with $p.price_from }}
+        {{ with .currency }}{{ $currency = . }}{{ end }}
+        {{ with .amount }}{{ $amount = . }}{{ end }}
+      {{ end }}
+
+      <a href="{{ $projectURL }}" class="results-card">
+        <div class="results-card__inner">
+
+          <img class="results-card__img" src="{{ $img }}" alt="{{ $title }}">
+
+          <div class="results-card__meta">
+            <div class="results-card__title">{{ $title }}</div>
+
+            <div class="results-card__row">
+              <span data-i18n="location">{{ index $t "location" | default "Location" }}</span>: {{ $loc }}
+            </div>
+
+            <div class="results-card__row">
+              <span data-i18n="price_from">{{ index $t "price_from" | default "Price from" }}</span>:
+              <span class="price">
+                <span class="price__currency">{{ $currency }}</span>
+                <span class="price__value">{{ $amount }}</span>
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </a>
+
+    {{ end }}
+
+    <!-- placeholders -->
+    <div class="results-card results-card--placeholder"><div class="results-card__inner"></div></div>
+    <div class="results-card results-card--placeholder"><div class="results-card__inner"></div></div>
+
+  </div>
+
+  <div class="results__bottom-space"></div>
+
+  <!-- Sticky query bar logic -->
+  <script>
+  (function () {
+    const STORAGE_KEY = "results_query";
+
+    const input = document.getElementById("resultsQuery");
+    const clearBtn = document.getElementById("resultsClear");
+    const results = document.getElementById("results");
+    if (!input || !clearBtn || !results) return;
+
+    // восстановление сохранённого текста
+    const saved = (localStorage.getItem(STORAGE_KEY) || "").trim();
+    if (saved) input.value = saved;
+
+    function emitUpdated(q){
+      window.dispatchEvent(new CustomEvent("search:updated", { detail: { q } }));
+    }
+
+    // Enter = сохранить запрос, можно потом фильтровать/использовать
+    input.addEventListener("keydown", function(e){
+      if (e.key === "Enter"){
+        e.preventDefault();
+        const q = (input.value || "").trim();
+        if (q) localStorage.setItem(STORAGE_KEY, q);
+        else localStorage.removeItem(STORAGE_KEY);
+        emitUpdated(q);
+        input.blur();
+      }
+      if (e.key === "Escape"){
+        e.preventDefault();
+        clearBtn.click();
+      }
+    });
+
+    // крестик: очистить и вернуть фокус в инпут
+    clearBtn.addEventListener("click", function(){
+      input.value = "";
+      localStorage.removeItem(STORAGE_KEY);
+      window.dispatchEvent(new CustomEvent("search:clear"));
+      emitUpdated("");
+      input.focus();
+    });
+
+    // если Get-скрипт (или чипы) захотят программно установить строку:
+    window.addEventListener("search:set", function(e){
+      const q = (e.detail && e.detail.q) ? String(e.detail.q).trim() : "";
+      input.value = q;
+      if (q) localStorage.setItem(STORAGE_KEY, q);
+      else localStorage.removeItem(STORAGE_KEY);
+      emitUpdated(q);
+    });
+
+  })();
+  </script>
+
+</section>

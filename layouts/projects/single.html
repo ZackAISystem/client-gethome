@@ -1,0 +1,35 @@
+{{ define "main" }}
+  {{ $blocks := .Params.blocks | default (slice) }}
+
+  {{ range $blocks }}
+    {{ $type := .type }}
+
+    {{/* 1) Если блок явно указал scope (project/home/shared) */}}
+    {{ $scope := .scope | default "" }}
+
+    {{ $candidates := slice }}
+
+    {{ if $scope }}
+      {{ $candidates = $candidates | append (printf "%s/%s.html" $scope $type) }}
+    {{ else }}
+      {{/* 2) Авто-приоритет: project -> shared -> home */}}
+      {{ $candidates = $candidates | append (printf "project/%s.html" $type) }}
+      {{ $candidates = $candidates | append (printf "shared/%s.html" $type) }}
+      {{ $candidates = $candidates | append (printf "home/%s.html" $type) }}
+    {{ end }}
+
+    {{ $picked := "" }}
+    {{ range $candidates }}
+      {{ if templates.Exists (printf "partials/%s" .) }}
+        {{ $picked = . }}
+      {{ end }}
+      {{ if $picked }}{{ break }}{{ end }}
+    {{ end }}
+
+    {{ if $picked }}
+      {{ partial $picked $ }}
+    {{ else }}
+      {{ warnf "Block partial not found for type=%q candidates=%v page=%q" $type $candidates $.RelPermalink }}
+    {{ end }}
+  {{ end }}
+{{ end }}

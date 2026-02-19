@@ -1,0 +1,14 @@
+{{ $key := .Params.project_key }}
+{{ $p := index site.Data.projects $key }}
+
+<section class="section" id="map">
+  <div class="container">
+    <div class="card">
+      <h3>Map</h3>
+      <!-- пока заглушка iframe/карты -->
+      <div class="map-frame">
+        <div class="muted">Embed map here (Google / Mapbox). Coordinates: {{ $p.map.lat }}, {{ $p.map.lng }}</div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,223 @@
+{{ $site := site.Data.site }}
+{{ $cta := $site.floating_cta }}
+
+{{ if $cta }}
+<div class="floating-cta" aria-label="Quick contact buttons">
+
+  {{/* WhatsApp CTA */}}
+  {{ with $cta.whatsapp }}
+    <a class="floating-cta__btn floating-cta__btn--whatsapp"
+       href="#"
+
+       data-phone-ru="971585584171,971585742688"
+       data-phone-en="971522403887"
+       data-phone-ar="971522403887"
+       data-phone-hi="971582793554"
+
+       data-wa-ru-home="Здравствуйте! Меня интересует недвижимость в ОАЭ. Пожалуйста, свяжитесь со мной."
+       data-wa-en-home="Hello! I’m interested in real estate in the UAE. Please contact me."
+       data-wa-ar-home="مرحبًا! أنا مهتم بالعقارات في الإمارات. من فضلك تواصل معي."
+       data-wa-hi-home="नमस्ते! मुझे यूएई में रियल एस्टेट में रुचि है। कृपया मुझसे संपर्क करें।"
+
+       data-wa-ru-project="Здравствуйте! Меня интересует дополнительная информация о проекте {project}, размещённом на GetHome.ae, а также о похожих доступных проектах. Ссылка на проект: {url}"
+       data-wa-en-project="Hello! I am interested in receiving more information about {project}, listed on GetHome.ae, as well as any similar available projects. Project link: {url}"
+       data-wa-ar-project="مرحبًا! أنا مهتم بالحصول على مزيد من المعلومات حول مشروع {project} المدرج على GetHome.ae، بالإضافة إلى أي مشاريع مشابهة متاحة. رابط المشروع: {url}"
+       data-wa-hi-project="नमस्ते! मैं GetHome.ae पर सूचीबद्ध {project} प्रोजेक्ट के बारे में अधिक जानकारी प्राप्त करना चाहता/चाहती हूँ, साथ ही इसी तरह के उपलब्ध अन्य प्रोजेक्ट्स के बारे में भी जानना चाहता/चाहती हूँ। प्रोजेक्ट लिंक: {url}"
+
+       aria-label="Chat on WhatsApp">
+      <img class="floating-cta__img"
+           src="{{ .img | relURL }}"
+           alt="{{ .alt }}"
+           loading="lazy">
+    </a>
+  {{ end }}
+
+  {{/* Telegram CTA */}}
+  {{ with $cta.telegram }}
+    <a class="floating-cta__btn floating-cta__btn--telegram"
+       href="#"
+       data-tg="GetHome_Dubai"
+
+       data-tg-ru-home="Здравствуйте! Меня интересует недвижимость в ОАЭ. Пожалуйста, свяжитесь со мной."
+       data-tg-en-home="Hello! I’m interested in real estate in the UAE. Please contact me."
+       data-tg-ar-home="مرحبًا! أنا مهتم بالعقارات في الإمارات. من فضلك تواصل معي."
+       data-tg-hi-home="नमस्ते! मुझे यूएई में रियल एस्टेट में रुचि है। कृपया मुझसे संपर्क करें।"
+
+       data-tg-ru-project="Здравствуйте! Меня интересует дополнительная информация о проекте {project}, размещённом на GetHome.ae, а также о похожих доступных проектах. Ссылка на проект: {url}"
+       data-tg-en-project="Hello! I am interested in receiving more information about {project}, listed on GetHome.ae, as well as any similar available projects. Project link: {url}"
+       data-tg-ar-project="مرحبًا! أنا مهتم بالحصول على مزيد من المعلومات حول مشروع {project} المدرج على GetHome.ae، بالإضافة إلى أي مشاريع مشابهة متاحة. رابط المشروع: {url}"
+       data-tg-hi-project="नमستे! मैं GetHome.ae पर सूचीबद्ध {project} प्रोजेक्ट के बारे में अधिक जानकारी प्राप्त करना चाहता/चाहती हूँ, साथ ही इसी तरह के उपलब्ध अन्य प्रोजेक्ट्स के बारे में भी जानना चाहता/चाहती हूँ। प्रोजेक्ट लिंक: {url}"
+
+       aria-label="Open Telegram">
+      <img class="floating-cta__img"
+           src="{{ .img | relURL }}"
+           alt="{{ .alt }}"
+           loading="lazy">
+    </a>
+  {{ end }}
+
+</div>
+
+<script>
+(function () {
+  // ✅ защита от двойной инициализации (если partial подключили дважды)
+  if (window.__FLOATING_CTA_INIT_V3__) return;
+  window.__FLOATING_CTA_INIT_V3__ = true;
+
+  const waBtn = document.querySelector(".floating-cta__btn--whatsapp");
+  const tgBtn = document.querySelector(".floating-cta__btn--telegram");
+  const input = document.querySelector(".home-hero__input");
+
+  const LANGS = ["en","ru","ar","hi"];
+
+  function normalizeLang(v) {
+    v = (v || "en").toLowerCase();
+    if (v.includes("-")) v = v.split("-")[0];
+    if (!LANGS.includes(v)) return "en";
+    return v;
+  }
+
+  // ✅ язык: сначала URL, потом <html lang>, потом localStorage/input/navigator
+  function getLangFromPath() {
+    const parts = (window.location.pathname || "/").split("/").filter(Boolean);
+    const first = normalizeLang(parts[0] || "");
+    if (["ru","ar","hi"].includes(first)) return first;
+    return "en";
+  }
+
+  function detectLang(text) {
+    if (!text) return null;
+    if (/[\u0600-\u06FF]/.test(text)) return "ar";
+    if (/[\u0900-\u097F]/.test(text)) return "hi";
+    if (/[А-Яа-яЁё]/.test(text)) return "ru";
+    return "en";
+  }
+
+  function attachLangSaver() {
+    if (!input) return;
+    const save = () => {
+      const lang = normalizeLang(detectLang((input.value || "").trim()) || "");
+      if (lang) localStorage.setItem("lang_pref", lang);
+    };
+    input.addEventListener("input", save, { passive: true });
+    input.addEventListener("change", save, { passive: true });
+  }
+
+  function getLangPref() {
+    const urlLang = getLangFromPath();
+    if (urlLang !== "en") return urlLang;
+
+    const htmlLang = normalizeLang(document.documentElement.getAttribute("lang") || "");
+    if (htmlLang && htmlLang !== "en") return htmlLang;
+
+    const saved = normalizeLang(localStorage.getItem("lang_pref") || "");
+    if (saved) return saved;
+
+    if (input && (input.value || "").trim()) {
+      const d = normalizeLang(detectLang(input.value.trim()) || "");
+      if (d) {
+        localStorage.setItem("lang_pref", d);
+        return d;
+      }
+    }
+
+    return normalizeLang(navigator.language || "en");
+  }
+
+  function isProjectPage() {
+    const p = window.location.pathname || "/";
+    return /^\/(ru|ar|hi)\/projects\//.test(p) || p.startsWith("/projects/");
+  }
+
+  function getProjectName() {
+    const raw = document.title || "this project";
+    const parts = raw.split(" · ");
+    return (parts[0] || raw).trim();
+  }
+
+  function normalizeUrl() {
+    const host = window.location.hostname;
+    if (host === "localhost" || host === "127.0.0.1") {
+      return "https://gethome.ae" + window.location.pathname;
+    }
+    return window.location.href;
+  }
+
+  function fillTemplate(tpl, project, url) {
+    return (tpl || "").replaceAll("{project}", project).replaceAll("{url}", url);
+  }
+
+  function getData(btn, key) {
+    return btn.getAttribute("data-" + key);
+  }
+
+  function pickTpl(btn, prefix, lang, kind) {
+    const k = prefix + "-" + lang + "-" + kind;
+    return getData(btn, k) || getData(btn, prefix + "-en-" + kind) || "";
+  }
+
+  function pickWaPhone(lang) {
+    const safe = normalizeLang(lang);
+    const raw = getData(waBtn, "phone-" + safe) || getData(waBtn, "phone-en") || "";
+    const phones = raw.split(",").map(s => s.trim()).filter(Boolean);
+    if (!phones.length) return "";
+
+    if (safe === "ru" && phones.length > 1) {
+      const cached = localStorage.getItem("wa_phone_ru");
+      if (cached && phones.includes(cached)) return cached;
+      const chosen = phones[Math.floor(Math.random() * phones.length)];
+      localStorage.setItem("wa_phone_ru", chosen);
+      return chosen;
+    }
+    return phones[0];
+  }
+
+  attachLangSaver();
+
+  if (waBtn) {
+    waBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // ✅ защита от двойного открытия (если внезапно второй обработчик где-то рядом)
+      if (waBtn.__opening) return;
+      waBtn.__opening = true;
+      setTimeout(() => waBtn.__opening = false, 600);
+
+      const lang = getLangPref();
+      const phone = pickWaPhone(lang);
+
+      const kind = isProjectPage() ? "project" : "home";
+      const project = getProjectName();
+      const url = normalizeUrl();
+
+      const tpl = pickTpl(waBtn, "wa", lang, kind);
+      const text = fillTemplate(tpl, project, url);
+
+      const waUrl = "https://wa.me/" + phone + "?text=" + encodeURIComponent(text);
+      window.open(waUrl, "_blank", "noopener");
+    }, true);
+  }
+
+  if (tgBtn) {
+    tgBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const lang = getLangPref();
+      const username = getData(tgBtn, "tg");
+      const kind = isProjectPage() ? "project" : "home";
+      const project = getProjectName();
+      const url = normalizeUrl();
+
+      const tpl = pickTpl(tgBtn, "tg", lang, kind);
+      const text = fillTemplate(tpl, project, url);
+
+      const tgUrl = "https://t.me/" + username + "?text=" + encodeURIComponent(text);
+      window.open(tgUrl, "_blank", "noopener");
+    }, true);
+  }
+})();
+</script>
+
+{{ end }}

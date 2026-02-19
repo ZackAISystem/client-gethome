@@ -1,0 +1,236 @@
+{{ $key := .Params.project_key }}
+{{ $p := (index site.Data.projects $key) | default (dict) }}
+
+{{/* ===== Language ===== */}}
+{{ $lang := .Site.Language.Lang | default "en" }}
+{{ $site := site.Data.site | default (dict) }}
+
+{{ $ui := index $site "ui_i18n" | default (dict) }}
+{{ $i18n := (index $ui $lang) | default (dict) }}
+
+{{/* ===== Helpers: localized pick with fallbacks ===== */}}
+{{ $name := "" }}
+{{ with (index $p "name") }}
+  {{ $name = (index . $lang) | default "" }}
+{{ end }}
+{{ if not $name }}
+  {{ $name = (index $p "project_name") | default "" }}
+{{ end }}
+{{ if not $name }}
+  {{/* last resort: use key */}}
+  {{ $name = $key }}
+{{ end }}
+
+{{ $heroTitle := "" }}
+{{ with (index $p "hero_title") }}
+  {{ $heroTitle = (index . $lang) | default "" }}
+{{ end }}
+{{ if not $heroTitle }}{{ $heroTitle = $name }}{{ end }}
+
+{{/* 1) Gallery source: JSON first, else scan folder */}}
+{{ $gallery := slice }}
+
+{{ $pGallery := index $p "gallery" }}
+{{ if and $pGallery (gt (len $pGallery) 0) }}
+  {{ $gallery = $pGallery }}
+{{ else }}
+  {{ $dir := printf "static/img/projects/%s" $key }}
+  {{ $items := slice }}
+
+  {{ if fileExists $dir }}
+    {{ $files := readDir $dir }}
+    {{ range $files }}
+      {{ if and (not .IsDir) (hasPrefix .Name "gallery_") (or
+        (strings.HasSuffix .Name ".jpg")
+        (strings.HasSuffix .Name ".jpeg")
+        (strings.HasSuffix .Name ".png")) }}
+
+        {{ $nStr := replaceRE `^gallery_([0-9]+)\..*$` `$1` .Name }}
+        {{ $n := int $nStr }}
+        {{ $src := printf "/img/projects/%s/%s" $key .Name }}
+        {{ $items = $items | append (dict "n" $n "src" $src) }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+
+  {{ $items = sort $items "n" "asc" }}
+  {{ range $items }}
+    {{ $gallery = $gallery | append .src }}
+  {{ end }}
+{{ end }}
+
+{{/* 2) First image */}}
+{{ $first := "/img/placeholder.jpg" }}
+{{ if gt (len $gallery) 0 }}
+  {{ $first = index $gallery 0 }}
+{{ else }}
+  {{/* мягкий fallback: если в JSON есть promo_image */}}
+  {{ $promo := index $p "promo_image" | default "" }}
+  {{ if $promo }}{{ $first = $promo }}{{ end }}
+{{ end }}
+
+{{/* 3) PDF CTA label: key -> ui_i18n */}}
+{{ $pdfKey := "" }}
+{{ with (index $p "cta") }}
+  {{ $pdfKey = (index . "pdf") | default "" }}
+{{ end }}
+
+{{ $pdfLabel := $pdfKey }}
+{{ if not $pdfLabel }}{{ $pdfLabel = "Get PDF" }}{{ end }}
+{{ if and $i18n $pdfKey }}
+  {{ $pdfLabel = (index $i18n $pdfKey) | default $pdfLabel }}
+{{ end }}
+
+{{/* 4) WhatsApp message template from site.json (project_cta_pdf.messages) */}}
+{{ $projectCta := index $site "project_cta_pdf" | default (dict) }}
+{{ $waMsgs := index $projectCta "messages" | default (dict) }}
+{{ $waTpl := (index $waMsgs $lang) | default "" }}
+{{ if not $waTpl }}{{ $waTpl = (index $waMsgs "en") | default "" }}{{ end }}
+{{ if not $waTpl }}
+  {{ $waTpl = "Hello! I’m interested in the project {project} on GetHome.ae and would like more details and the full PDF. Project link: {url}" }}
+{{ end }}
+
+<section class="gallery-hero" data-gallery-hero>
+  <div class="gallery-hero__stage">
+
+    <img
+      class="gallery-hero__img"
+      data-gallery-img
+      src="{{ $first }}"
+      alt="{{ $name }}"
+    >
+
+    <!-- Hero title -->
+    {{ $words := split $heroTitle " " }}
+    {{ if gt (len $words) 2 }}
+      {{ $line1 := delimit (first 2 $words) " " }}
+      {{ $line2 := delimit (after 2 $words) " " }}
+      <h1 class="gallery-hero__title">{{ $line1 }}<br>{{ $line2 }}</h1>
+    {{ else }}
+      <h1 class="gallery-hero__title">{{ $heroTitle }}</h1>
+    {{ end }}
+
+    <!-- Nav -->
+    <button class="gallery-hero__nav gallery-hero__nav--prev" type="button" aria-label="Previous image">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15 18l-6-6 6-6"></path>
+      </svg>
+    </button>
+
+    <button class="gallery-hero__nav gallery-hero__nav--next" type="button" aria-label="Next image">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9 6l6 6-6 6"></path>
+      </svg>
+    </button>
+
+    <!-- PDF CTA -> WhatsApp -->
+    <a class="gallery-hero__pdf"
+       href="#"
+       data-wa-template="{{ $waTpl | htmlEscape }}"
+       aria-label="Get full project PDF via WhatsApp">
+      {{ $pdfLabel }}
+    </a>
+
+    <!-- Hidden gallery list for JS -->
+    <div class="hidden" data-gallery-list>
+      {{ range $gallery }}
+        <span data-src="{{ . }}"></span>
+      {{ end }}
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const root = document.currentScript.closest('[data-gallery-hero]');
+      if (!root) return;
+
+      const img = root.querySelector('[data-gallery-img]');
+      const prev = root.querySelector('.gallery-hero__nav--prev');
+      const next = root.querySelector('.gallery-hero__nav--next');
+      const nodes = root.querySelectorAll('[data-gallery-list] [data-src]');
+
+      const srcs = Array.from(nodes).map(n => n.dataset.src).filter(Boolean);
+
+      // Даже если галереи нет — страница должна жить (WhatsApp тоже должен жить)
+      let i = 0;
+      if (img && srcs.length > 0) {
+        i = Math.max(0, srcs.indexOf(img.getAttribute('src')));
+        function show(idx) {
+          i = (idx + srcs.length) % srcs.length;
+          img.src = srcs[i];
+        }
+        prev && prev.addEventListener('click', () => show(i - 1));
+        next && next.addEventListener('click', () => show(i + 1));
+      }
+
+      // ---- WhatsApp logic for PDF CTA ----
+      const pdfBtn = root.querySelector('.gallery-hero__pdf');
+      if (!pdfBtn) return;
+
+      let SITE = {{ $site | jsonify }};
+      if (typeof SITE === "string") {
+        try { SITE = JSON.parse(SITE); } catch (e) { SITE = {}; }
+      }
+
+      const LANGS = ["en","ru","ar","hi"];
+
+      function normalizeLang(v) {
+        v = (v || "en").toLowerCase();
+        if (v.includes("-")) v = v.split("-")[0];
+        if (!LANGS.includes(v)) return "en";
+        return v;
+      }
+
+      function getLangFromPath() {
+        const parts = (window.location.pathname || "/").split("/").filter(Boolean);
+        const first = normalizeLang(parts[0] || "");
+        if (first === "ru" || first === "ar" || first === "hi") return first;
+        return "en";
+      }
+
+      function pickWaPhone(lang) {
+        const safe = normalizeLang(lang);
+        const routing = (SITE && SITE.wa_routing) ? SITE.wa_routing : null;
+        const entry = (routing && routing[safe]) ? routing[safe] : (routing && routing["en"]);
+        const phones = (entry && entry.phones) ? entry.phones : [];
+        const fallback = (SITE && SITE.whatsapp && SITE.whatsapp.phone) ? String(SITE.whatsapp.phone) : "";
+        if (!phones.length) return fallback;
+        if (safe === "ru" && phones.length > 1) return phones[Math.floor(Math.random() * phones.length)];
+        return phones[0] || fallback;
+      }
+
+      function normalizeUrl() {
+        const host = window.location.hostname;
+        if (host === "localhost" || host === "127.0.0.1") {
+          return "https://gethome.ae" + window.location.pathname;
+        }
+        return window.location.href;
+      }
+
+      function fillTemplate(tpl, project, url) {
+        return (tpl || "")
+          .replaceAll("{project}", project)
+          .replaceAll("{url}", url);
+      }
+
+      pdfBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        const lang = getLangFromPath();
+        const phone = pickWaPhone(lang);
+        if (!phone) return;
+
+        const url = normalizeUrl();
+        const project = {{ $name | jsonify }};
+
+        let tpl = pdfBtn.getAttribute("data-wa-template") || "";
+        if (!tpl) {
+          tpl = "Hello! I’m interested in the project {project} on GetHome.ae and would like more details and the full PDF. Project link: {url}";
+        }
+
+        const text = fillTemplate(tpl, project, url);
+        const waUrl = "https://wa.me/" + phone + "?text=" + encodeURIComponent(text);
+        window.open(waUrl, "_blank", "noopener");
+      });
+    })();
+  </script>
+</section>

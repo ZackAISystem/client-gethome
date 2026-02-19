@@ -1,0 +1,282 @@
+{{/* layouts/partials/project/project_info.html */}}
+
+{{ $key := .Params.project_key }}
+{{ $p := index site.Data.projects $key }}
+
+{{/* ---------- language + ui i18n ---------- */}}
+{{ $lang := $.Site.Language.Lang | default "en" }}
+{{ $i18nAll := site.Data.site.ui_i18n }}
+{{ $t := index $i18nAll $lang }}
+{{ if not $t }}{{ $t = index $i18nAll "en" }}{{ end }}
+
+{{/* ---------- localized fields (string OR {en/ru/ar/hi}) ---------- */}}
+{{ $projectName := partial "helpers/localize.html" (dict "v" $p.name "lang" $lang) }}
+{{ if not $projectName }}
+  {{ $projectName = partial "helpers/localize.html" (dict "v" $p.hero_title "lang" $lang) }}
+{{ end }}
+{{ if not $projectName }}{{ $projectName = "Project" }}{{ end }}
+
+{{ $developer := partial "helpers/localize.html" (dict "v" $p.developer "lang" $lang) }}
+{{ $handover  := partial "helpers/localize.html" (dict "v" $p.handover "lang" $lang) }}
+{{ $unitTypes := partial "helpers/localize.html" (dict "v" $p.unit_types "lang" $lang) }}
+{{ $size      := partial "helpers/localize.html" (dict "v" $p.size "lang" $lang) }}
+{{ $downPay   := partial "helpers/localize.html" (dict "v" $p.down_payment "lang" $lang) }}
+{{ $payPlan   := partial "helpers/localize.html" (dict "v" $p.payment_plan "lang" $lang) }}
+
+{{/* ✅ Pay plan RTL-friendly swap for Arabic: "60/40" -> "40/60" */}}
+{{ $payPlanOut := $payPlan }}
+{{ if and (eq $lang "ar") $payPlan }}
+  {{ if in $payPlan "/" }}
+    {{ $pp := split $payPlan "/" }}
+    {{ if eq (len $pp) 2 }}
+      {{ $payPlanOut = printf "%s/%s" (index $pp 1) (index $pp 0) }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ $desc := partial "helpers/localize.html" (dict "v" $p.description "lang" $lang) }}
+{{ if not $desc }}
+  {{ $desc = (printf "Luxury waterfront living by %s. Premium residences, iconic views, and a refined lifestyle." $developer) }}
+{{ end }}
+
+{{/* ---------- Address + lat/lng safely ---------- */}}
+{{ $address := "" }}
+{{ $lat := "" }}
+{{ $lng := "" }}
+
+{{ if $p.map }}
+  {{ $address = partial "helpers/localize.html" (dict "v" (index $p.map "address") "lang" $lang) }}
+  {{ $lat = index $p.map "lat" }}
+  {{ $lng = index $p.map "lng" }}
+{{ end }}
+
+{{/* ---------- Property types (map[lang][]string) -> []string ---------- */}}
+{{ $propTypes := slice }}
+{{ if $p.property_types }}
+  {{ $propTypes = index $p.property_types $lang }}
+  {{ if not $propTypes }}{{ $propTypes = index $p.property_types "en" }}{{ end }}
+{{ end }}
+
+{{/* ---------- Nearby landmarks (map[lang][]map{name,time}) -> [] ---------- */}}
+{{ $near := slice }}
+{{ if $p.nearby_landmarks }}
+  {{ $near = index $p.nearby_landmarks $lang }}
+  {{ if not $near }}{{ $near = index $p.nearby_landmarks "en" }}{{ end }}
+{{ end }}
+
+{{/* ---------- Price parts (price_from is {currency, amount}) ---------- */}}
+{{ $cur := "AED" }}
+{{ $amt := "" }}
+{{ if $p.price_from }}
+  {{ $cur = index $p.price_from "currency" | default "AED" }}
+  {{ $amt = index $p.price_from "amount" | default "" }}
+{{ end }}
+
+<section class="project-info">
+  <div class="project-info__wrap">
+
+    <!-- Top pills row -->
+    <div class="project-info__pills">
+      <div class="pill pill--title">
+        <span class="pill__title">{{ $projectName }}</span>
+      </div>
+
+      <div class="pill">
+        <span class="pill__label">{{ index $t "handover" | default "Handover" }}</span>
+        <span class="pill__value">{{ $handover }}</span>
+      </div>
+
+      <div class="pill">
+        <span class="pill__label">{{ index $t "price_from" | default "Price From" }}</span>
+        <span class="pill__value money-ltr">
+          {{ if and $cur $amt }}
+            <span class="price">
+              <span class="price__currency">{{ $cur }}</span>
+              <span class="price__value">{{ $amt }}</span>
+            </span>
+          {{ end }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Cards grid -->
+    <div class="project-info__grid">
+
+      <!-- Details -->
+      <div class="card">
+        <div class="card__head">{{ index $t "details" | default "Details" }}</div>
+        <div class="card__body">
+
+          <div class="kv">
+            <div class="kv__label">{{ index $t "developer" | default "Developer" }}</div>
+            <div class="kv__value">{{ $developer }}</div>
+          </div>
+
+          <div class="kv">
+            <div class="kv__label">{{ index $t "property_type" | default "Property Type" }}</div>
+            <div class="kv__value">
+              {{ if $propTypes }}{{ delimit $propTypes ", " }}{{ end }}
+            </div>
+          </div>
+
+          <div class="kv">
+            <div class="kv__label">{{ index $t "unit_type" | default "Unit Type" }}</div>
+            <div class="kv__value">{{ $unitTypes }}</div>
+          </div>
+
+          <div class="kv">
+            <div class="kv__label">{{ index $t "size" | default "Size (sqft)" }}</div>
+            <div class="kv__value">{{ $size }}</div>
+          </div>
+
+          <div class="kv">
+            <div class="kv__label">{{ index $t "down_payment" | default "Down Payment" }}</div>
+            <div class="kv__value">{{ $downPay }}</div>
+          </div>
+
+          <div class="kv">
+            <div class="kv__label">{{ index $t "payment_plan" | default "Payment Plan" }}</div>
+            <div class="kv__value"><span class="bidi-ltr">{{ $payPlanOut }}</span></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="card">
+        <div class="card__head">{{ index $t "description" | default "Description" }}</div>
+        <div class="card__body">
+          <p class="desc">{{ $desc }}</p>
+        </div>
+      </div>
+
+      <!-- Nearby landmarks (language-safe) -->
+      <div class="card">
+        <div class="card__head">{{ index $t "nearby" | default "Nearby landmarks" }}</div>
+        <div class="card__body">
+          {{ range $near }}
+            {{ $nm := partial "helpers/localize.html" (dict "v" .name "lang" $lang) }}
+            <div class="kv kv--row">
+              <div class="kv__label">{{ $nm }}</div>
+              <div class="kv__value">{{ .time }}</div>
+            </div>
+          {{ end }}
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="card card--location">
+        <div class="card__head card__head--location">
+          <span class="card__title">{{ index $t "location" | default "Location" }}</span>
+          <span class="card__value">{{ $address }}</span>
+        </div>
+
+        <div class="card__body card__body--map">
+          <div class="loc__map">
+            <iframe
+              title="Map"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://www.google.com/maps?q={{ $lat }},{{ $lng }}&z=13&output=embed">
+            </iframe>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /grid -->
+
+    <!-- CTA row -->
+    <div class="project-info__cta">
+      <a class="cta-pill cta-pill--ghost" href="/#search">← {{ index $t "search" | default "Search" }}</a>
+
+      {{/* ===== WhatsApp phone routing (ONLY WA logic touched) ===== */}}
+      {{ $routing := site.Data.site.wa_routing }}
+      {{ $entry := index $routing $lang }}
+      {{ if not $entry }}{{ $entry = index $routing "en" }}{{ end }}
+      {{ $phones := slice }}
+      {{ if $entry }}{{ $phones = index $entry "phones" }}{{ end }}
+
+      {{ $waPhone := "" }}
+      {{ if and (eq $lang "ru") (ge (len $phones) 2) }}
+        {{/* RU: random 50/50 (server-side). */}}
+        {{ $waPhone = index $phones (mod (now.Unix) (len $phones)) }}
+      {{ else if ge (len $phones) 1 }}
+        {{ $waPhone = index $phones 0 }}
+      {{ else }}
+        {{ $waPhone = site.Data.site.whatsapp.phone | default "971522403887" }}
+      {{ end }}
+
+      {{ $callMsgs := site.Data.site.project_cta_call.messages }}
+
+      <a class="cta-pill cta-pill--green js-wa-call"
+         href="#"
+         data-phone="{{ $waPhone }}"
+         data-wa-en-project="{{ index $callMsgs "en" }}"
+         data-wa-ru-project="{{ index $callMsgs "ru" }}"
+         data-wa-ar-project="{{ index $callMsgs "ar" }}"
+         data-wa-hi-project="{{ index $callMsgs "hi" }}"
+      >
+        {{ index $t "request_call" | default "Request a call" }}
+      </a>
+
+      <a class="cta-pill cta-pill--blue" href="#mortgage">{{ index $t "calc_mortgage" | default "Calculate mortgage" }}</a>
+    </div>
+
+  </div>
+
+  <script>
+  (function () {
+    const btn = document.querySelector(".js-wa-call");
+    if (!btn) return;
+
+    function getLangPref() {
+      const saved = localStorage.getItem("lang_pref");
+      if (saved) return saved;
+
+      const nav = (navigator.language || "en").toLowerCase();
+      if (nav.startsWith("ru")) return "ru";
+      if (nav.startsWith("ar")) return "ar";
+      if (nav.startsWith("hi")) return "hi";
+      return "en";
+    }
+
+    function normalizeUrl() {
+      const host = window.location.hostname;
+      if (host === "localhost" || host === "127.0.0.1") {
+        return "https://gethome.ae" + window.location.pathname;
+      }
+      return window.location.href;
+    }
+
+    function fillTemplate(tpl, project, url) {
+      return (tpl || "")
+        .replaceAll("{project}", project)
+        .replaceAll("{url}", url);
+    }
+
+    function getData(el, key) {
+      return el.getAttribute("data-" + key);
+    }
+
+    function pickTpl(el, lang, kind) {
+      return getData(el, "wa-" + lang + "-" + kind) || getData(el, "wa-en-" + kind);
+    }
+
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+
+      const lang = getLangPref();
+      const phone = getData(btn, "phone"); // no old fallback
+      const project = {{ printf "%q" $projectName }};
+      const url = normalizeUrl();
+
+      const tpl = pickTpl(btn, lang, "project");
+      const text = fillTemplate(tpl, project, url);
+
+      const waUrl = "https://wa.me/" + phone + "?text=" + encodeURIComponent(text);
+      window.open(waUrl, "_blank", "noopener");
+    });
+  })();
+  </script>
+
+</section>
