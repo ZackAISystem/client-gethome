@@ -321,13 +321,15 @@ h1, h2, h3, h4, h5 {
   MOBILE OVERRIDES (Home Hero)
 ========================= */
 
-@media (max-height: 820px){
+/* Работает ТОЛЬКО если и ширина мобильная, и высота маленькая */
+@media (max-width: 768px) and (max-height: 820px){
+
   .home-hero__wrap{
     min-height: 640px;
   }
 
   .home-hero__panel{
-    bottom: 54px;        /* было 72px */
+    bottom: 54px;
     height: 260px;
   }
 
@@ -365,7 +367,7 @@ h1, h2, h3, h4, h5 {
   .home-hero__panel{
     left: 16px;
     right: 16px;
-    bottom: 56px;       /* было 74px */
+    bottom: 56px;
     height: 260px;
     border-radius: 28px;
   }
@@ -408,6 +410,7 @@ h1, h2, h3, h4, h5 {
     left: 24px;
     right: 24px;
     top: 90px;
+
     justify-content: center;
     gap: 10px;
     flex-wrap: wrap;
@@ -426,9 +429,10 @@ h1, h2, h3, h4, h5 {
 }
 
 @media (max-width: 520px){
+
   .home-hero__panel{
     height: 250px;
-    bottom: 70px;       /* было 90px */
+    bottom: 70px;
   }
 
   .home-hero__search{
