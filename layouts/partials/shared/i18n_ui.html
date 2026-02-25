@@ -66,24 +66,25 @@
     return document.getElementById("resultsQuery") || document.getElementById("resultsQueryInput");
   }
 
-  // ✅ центральная синхронизация: сохранить + отдать вниз
+  // ✅ центральная синхронизация: сохраняем canon, а в UI пишем raw (без trim)
   function syncQueryToResults(q) {
-    const v = (q || "").trim();
+    const raw   = String(q || "");   // как пользователь набрал (включая пробелы)
+    const canon = raw.trim();        // как фильтруем/сохраняем
 
     try {
-      if (v) localStorage.setItem(RESULTS_STORAGE_KEY, v);
+      if (canon) localStorage.setItem(RESULTS_STORAGE_KEY, canon);
       else localStorage.removeItem(RESULTS_STORAGE_KEY);
     } catch (e) {}
 
-    // отдадим в results_section (если он слушает search:set)
+    // фильтр/движок — только canon
     try {
-      window.dispatchEvent(new CustomEvent("search:set", { detail: { q: v } }));
-      window.dispatchEvent(new CustomEvent("search:updated", { detail: { q: v } }));
+      window.dispatchEvent(new CustomEvent("search:set", { detail: { q: canon } }));
+      window.dispatchEvent(new CustomEvent("search:updated", { detail: { q: canon } }));
     } catch (e) {}
 
-    // и напрямую положим в input, если он уже в DOM
+    // UI — raw, но НЕ трогаем если поле сейчас в фокусе (иначе "пробел не работает")
     const rInput = getResultsInput();
-    if (rInput) rInput.value = v;
+    if (rInput && document.activeElement !== rInput) rInput.value = raw;
   }
 
   function applyDomI18n(lang) {
@@ -118,7 +119,6 @@
     }
 
     // ✅ results sticky input placeholder (только placeholder, ничего больше)
-    // key: results_search_placeholder (fallback: search_placeholder)
     const resultsInput = getResultsInput();
     if (resultsInput) {
       const ph2 = t(safe, "results_search_placeholder") || t(safe, "search_placeholder");
@@ -134,10 +134,11 @@
     const results = document.getElementById("results");
     if (!results) return false;
 
-    const v = (q || "").trim();
+    const raw = String(q || "");
+    const canon = raw.trim();
 
-    // ✅ синхронизируем сразу (storage + input + events)
-    syncQueryToResults(v);
+    // ✅ синхронизируем сразу (storage + events + UI)
+    syncQueryToResults(raw);
 
     results.classList.add("is-open");
     results.setAttribute("aria-hidden", "false");
@@ -153,7 +154,7 @@
 
     try {
       sessionStorage.setItem(SS_FLAG, "1");
-      sessionStorage.setItem(SS_QUERY, (queryValue || "").trim());
+      sessionStorage.setItem(SS_QUERY, String(queryValue || "").trim());
     } catch (e) {}
 
     localStorage.setItem("lang_pref", safe);
@@ -190,16 +191,20 @@
     }
   } catch (e) {}
 
-  // input auto-detect language: DOM-only (без редиректа)
+  // ✅ input auto-detect language: НЕ дергаем i18n на каждый символ (только когда язык реально меняется)
   const input = document.querySelector(".home-hero__input");
   if (input) {
     input.addEventListener("input", () => {
-      const v = (input.value || "").trim();
-      if (!v) return;
+      const raw = (input.value || ""); // НЕ trim
+      if (!raw) return;
 
-      const lang = normalizeLang(detectLang(v) || "en");
-      localStorage.setItem("lang_pref", lang);
-      applyDomI18n(lang);
+      const next = normalizeLang(detectLang(raw) || "en");
+      const cur  = (document.documentElement.getAttribute("lang") || "en").toLowerCase();
+
+      if (next === cur) return; // не трогаем DOM при обычном наборе
+
+      localStorage.setItem("lang_pref", next);
+      applyDomI18n(next);
     }, { passive: true });
   }
 
@@ -220,7 +225,6 @@
         return;
       }
 
-      // ✅ язык совпадает: синхронизируем строку results, а дальше пусть твой старый submit делает своё
       syncQueryToResults(q);
     }, true);
   }

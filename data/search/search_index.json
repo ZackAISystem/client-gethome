@@ -2677,10 +2677,10 @@
       ]
     },
     {
-      "key": "soulever-maritime-city",
-      "slug": "soulever-maritime-city",
-      "emirate": "",
-      "city": "",
+      "key": "soulever-by-beyond",
+      "slug": "soulever-by-beyond",
+      "emirate": "dubai",
+      "city": "dubai",
       "area": "",
       "developer": "",
       "property_types": [],
@@ -2690,7 +2690,7 @@
       "price_from_aed": null,
       "size_from_sqft": null,
       "tokens": [
-        "soulever-maritime-city",
+        "soulever-by-beyond",
         "uae"
       ]
     },

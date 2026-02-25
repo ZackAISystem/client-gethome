@@ -102,14 +102,13 @@
   let examples = getExamples();
 
   chips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      const text = (chip.textContent || '').trim();
-      const cur  = (input.value || '').trim();
-      input.value = cur ? (cur + ' · ' + text) : text;
-      stopTyping();
-      input.focus();
-    });
+  chip.addEventListener('click', () => {
+    // НИЧЕГО не меняем в input.value тут.
+    // Чипы обрабатывает search_engine.html (глобальный document.addEventListener("click", ..., true))
+    stopTyping();
+    input.focus();
   });
+});
 
   form.addEventListener('submit', e => {
     e.preventDefault();

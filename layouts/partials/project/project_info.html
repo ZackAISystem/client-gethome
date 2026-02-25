@@ -187,7 +187,9 @@
 
     <!-- CTA row -->
     <div class="project-info__cta">
-      <a class="cta-pill cta-pill--ghost" href="/#search">← {{ index $t "search" | default "Search" }}</a>
+    <a class="cta-pill cta-pill--ghost" href="{{ .Site.Home.RelPermalink }}#results">
+  ← {{ index $t "search" | default "Search" }}
+</a>
 
       {{/* ===== WhatsApp phone routing (ONLY WA logic touched) ===== */}}
       {{ $routing := site.Data.site.wa_routing }}
